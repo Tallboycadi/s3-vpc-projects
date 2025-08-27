@@ -74,26 +74,8 @@ resource "aws_instance" "ssm_test" {
   user_data = <<-EOF
     #!/bin/bash
     systemctl enable --now amazon-ssm-agent || true
-  EOF
+EOF
 
   tags = { Name = "${var.project_name}-ssm-test" }
 }
 
-output "ec2_instance_id" {
-  value = aws_instance.ssm_test.id
-}
-resource "aws_instance" "ssm_test" {
-  ami                         = data.aws_ami.al2023.id
-  instance_type               = "t3.micro"
-  subnet_id                   = aws_subnet.public_a.id
-  associate_public_ip_address = true                        # <— turn on public IP
-  vpc_security_group_ids      = [aws_security_group.ec2.id] # egress-only SG is fine
-  iam_instance_profile        = aws_iam_instance_profile.ec2_ssm_profile.name
-
-  user_data = <<-EOF
-    #!/bin/bash
-    systemctl enable --now amazon-ssm-agent || true
-  EOF
-
-  tags = { Name = "${var.project_name}-ssm-test" }
-}

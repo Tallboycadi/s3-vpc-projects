@@ -7,11 +7,11 @@ locals {
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = local.bucket_name
-  tags   = { Name = local.bucket_name }
+  bucket        = local.bucket_name
+  force_destroy = true # allows destroy even if objects remain
+  tags          = { Name = local.bucket_name }
 }
 
-# Block all public access (safe default). If you later want website hosting, we’ll adjust.
 resource "aws_s3_bucket_public_access_block" "this" {
   bucket                  = aws_s3_bucket.this.id
   block_public_acls       = true
