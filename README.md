@@ -21,20 +21,35 @@
 ## Architecture
 
 ```mermaid
-flowchart LR
-  Dev[VS Code / Terraform] -->|apply| AWS[(AWS)]
-  subgraph VPC 10.20.0.0/16
+
+flowchart TB
+  Dev[Developer<br/>
+  VS Code + Terraform] -->|apply| AWS[(AWS Account)]
+
+  subgraph VPC["VPC 10.20.0.0/16"]
+    direction TB
     IGW[Internet Gateway]
     RTpub[Public Route Table]
-    SubA[Public Subnet A 10.20.1.0/24]
-    SubB[Public Subnet B 10.20.2.0/24]
-    EC2[EC2 t3.micro (SSM Agent)]
+    SubA[Public Subnet A<br/>10.20.1.0/24]
+    SubB[Public Subnet B<br/>10.20.2.0/24]
+    EC2[EC2 t3.micro
+    (SSM Agent)]
   end
 
-  EC2 ---|SSM| AWS_SSM[(AWS Systems Manager)]
+  SSM_SVC[(AWS Systems Manager)]
+  S3[(Amazon S3)]
+  DDB[(Amazon DynamoDB)]
+  GWE[Gateway Endpoints<br/>S3 + DynamoDB]
+
+  EC2 -- SSM --> SSM_SVC
   RTpub --> IGW
-  VPC ---|Gateway Endpoint| S3[(Amazon S3)]
-  VPC ---|Gateway Endpoint| DDB[(Amazon DynamoDB)]
+
+  SubA -.-> GWE
+  SubB -.-> GWE
+  GWE -.-> S3
+  GWE -.-> DDB
+
+
 # clone
 git clone https://github.com/Tallboycadi/s3-vpc-projects.git
 cd s3-vpc-projects
@@ -49,3 +64,4 @@ terraform fmt -recursive
 terraform validate
 terraform plan -out tfplan
 terraform apply tfplan
+
