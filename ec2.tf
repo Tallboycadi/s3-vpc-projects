@@ -25,7 +25,7 @@ data "aws_ami" "al2023" {
 resource "aws_iam_role" "ec2_ssm_role" {
   name = "${var.project_name}-ec2-ssm-role"
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17",
+    Version = "2012-10-17",
     Statement = [{
       Effect    = "Allow",
       Principal = { Service = "ec2.amazonaws.com" },
@@ -63,12 +63,12 @@ resource "aws_security_group" "ec2" {
 
 # --- The test instance (NO public IP) ---
 resource "aws_instance" "ssm_test" {
-  ami                    = data.aws_ami.al2023.id
-  instance_type          = "t3.micro"
-  subnet_id              = aws_subnet.public_a.id
+  ami                         = data.aws_ami.al2023.id
+  instance_type               = "t3.micro"
+  subnet_id                   = aws_subnet.public_a.id
   associate_public_ip_address = false
-  vpc_security_group_ids = [aws_security_group.ec2.id]
-  iam_instance_profile   = aws_iam_instance_profile.ec2_ssm_profile.name
+  vpc_security_group_ids      = [aws_security_group.ec2.id]
+  iam_instance_profile        = aws_iam_instance_profile.ec2_ssm_profile.name
 
   # AL2023 already has SSM Agent; ensure it's running
   user_data = <<-EOF
@@ -81,4 +81,19 @@ resource "aws_instance" "ssm_test" {
 
 output "ec2_instance_id" {
   value = aws_instance.ssm_test.id
+}
+resource "aws_instance" "ssm_test" {
+  ami                         = data.aws_ami.al2023.id
+  instance_type               = "t3.micro"
+  subnet_id                   = aws_subnet.public_a.id
+  associate_public_ip_address = true                        # <— turn on public IP
+  vpc_security_group_ids      = [aws_security_group.ec2.id] # egress-only SG is fine
+  iam_instance_profile        = aws_iam_instance_profile.ec2_ssm_profile.name
+
+  user_data = <<-EOF
+    #!/bin/bash
+    systemctl enable --now amazon-ssm-agent || true
+  EOF
+
+  tags = { Name = "${var.project_name}-ssm-test" }
 }

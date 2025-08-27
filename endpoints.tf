@@ -17,7 +17,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
 # Use the same security group for VPC endpoints
 resource "aws_security_group" "vpce" {
   name        = "${var.project_name}-vpce-sg"
-  description = "Allow HTTPS from VPC to Interface Endpoints"
+  description = "Security group for VPC endpoints"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -36,32 +36,5 @@ resource "aws_security_group" "vpce" {
 
   tags = { Name = "${var.project_name}-vpce-sg" }
 }
-resource "aws_vpc_endpoint" "ssm" {
-  vpc_id              = aws_vpc.main.id
-  service_name        = "com.amazonaws.${var.region}.ssm"
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
-  security_group_ids  = [aws_security_group.vpce.id]
-  private_dns_enabled = true
-  tags                = { Name = "${var.project_name}-vpce-ssm" }
-}
 
-resource "aws_vpc_endpoint" "ssmmessages" {
-  vpc_id              = aws_vpc.main.id
-  service_name        = "com.amazonaws.${var.region}.ssmmessages"
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
-  security_group_ids  = [aws_security_group.vpce.id]
-  private_dns_enabled = true
-  tags                = { Name = "${var.project_name}-vpce-ssmmessages" }
-}
 
-resource "aws_vpc_endpoint" "ec2messages" {
-  vpc_id              = aws_vpc.main.id
-  service_name        = "com.amazonaws.${var.region}.ec2messages"
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
-  security_group_ids  = [aws_security_group.vpce.id]
-  private_dns_enabled = true
-  tags                = { Name = "${var.project_name}-vpce-ec2messages" }
-}
