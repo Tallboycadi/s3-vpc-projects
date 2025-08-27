@@ -30,8 +30,10 @@ flowchart TB
     direction TB
     IGW[Internet Gateway]
     RTpub[Public Route Table]
-    SubA[Public Subnet A<br/>10.20.1.0/24]
-    SubB[Public Subnet B<br/>10.20.2.0/24]
+    SubA[Public Subnet A
+    10.20.1.0/24]
+    SubB[Public Subnet B
+    10.20.2.0/24]
     EC2[EC2 t3.micro
     (SSM Agent)]
   end
@@ -39,11 +41,11 @@ flowchart TB
   SSM_SVC[(AWS Systems Manager)]
   S3[(Amazon S3)]
   DDB[(Amazon DynamoDB)]
-  GWE[Gateway Endpoints<br/>S3 + DynamoDB]
+  GWE[Gateway Endpoints
+  S3 + DynamoDB]
 
   EC2 -- SSM --> SSM_SVC
   RTpub --> IGW
-
   SubA -.-> GWE
   SubB -.-> GWE
   GWE -.-> S3
@@ -64,4 +66,5 @@ terraform fmt -recursive
 terraform validate
 terraform plan -out tfplan
 terraform apply tfplan
+
 
